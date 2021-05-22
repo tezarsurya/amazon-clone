@@ -1,12 +1,19 @@
-import React from "react";
 import Image from "next/image";
 import {
   MenuIcon,
   SearchIcon,
   ShoppingCartIcon,
 } from "@heroicons/react/outline";
+import { signIn, signOut, useSession } from "next-auth/client";
+import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
+import { selectItems } from "../slices/basketSlice";
 
 const Header = () => {
+  const [session] = useSession();
+  const router = useRouter();
+  const items = useSelector(selectItems);
+
   return (
     <header>
       {/* top nav */}
@@ -18,6 +25,7 @@ const Header = () => {
             height={40}
             objectFit="contain"
             className="cursor-pointer"
+            onClick={() => router.push("/")}
           />
         </div>
 
@@ -32,17 +40,20 @@ const Header = () => {
 
         {/* right */}
         <div className="text-white flex items-center text-xs space-x-6 px-4">
-          <div className="link">
-            <p>Hello Tezar</p>
+          <div className="link" onClick={!session ? signIn : signOut}>
+            <p>{session ? `Hello, ${session.user.name}` : "Sign In"}</p>
             <p className="font-extrabold md:text-sm">Account & List</p>
           </div>
           <div className="link">
             <p>Returns</p>
             <p className="font-extrabold md:text-sm">& Orders</p>
           </div>
-          <div className="relative link flex items-center">
+          <div
+            className="relative link flex items-center"
+            onClick={() => router.push("/checkout")}
+          >
             <span className="absolute right-0 top-0 md:right-10 h-4 w-4 bg-yellow-400 text-center rounded-full text-black font-bold">
-              0
+              {items.length}
             </span>
             <ShoppingCartIcon className="h-10" />
             <p className="hidden md:inline font-extrabold md:text-sm mt-2">
